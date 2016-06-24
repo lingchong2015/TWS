@@ -12,6 +12,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Process;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
@@ -60,10 +62,11 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private String mTransmitterTotalInformationJsonString = "";// Transmitter dynamic information json string received from server which used to pop up dialog.
     private String mLastTransmitterDynamicInformationJsonString = "";// Last json string received from server which used to display on UI when network is disconnected.
-
     private List<TransmitterTotalInformationModel> mTransmitterTotalInformationModelList = new ArrayList<>();// Transmitter total information model list parsed by json string return from server at first time.
     private List<TransmitterDynamicInformationModel> mLastTransmitterDynamicInformationModelList = new ArrayList<>();// Last Transmitter dynamic information list parsed by json string return from server at last time.
     private Thread mThreadAlarm = null;// The alarm thread.
+
+    private long mExitTime = 0;// Time to control whether to exit.
 
     // Constant variables for communicating with login activity.
     public static final int REQUEST_CODE_FOR_LOGIN_ACTIVITY = 0;
@@ -476,6 +479,21 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private void startAlarm() {
         mThreadAlarm = new Thread(new AlarmThreadRunnable());
         mThreadAlarm.start();
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+                mExitTime = System.currentTimeMillis();
+            } else {
+                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
+                finish();
+            }
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
