@@ -44,6 +44,7 @@ import curry.stephen.tws.model.MyRecyclerViewModel;
 import curry.stephen.tws.model.TransmitterDynamicInformationModel;
 import curry.stephen.tws.model.TransmitterTotalInformationModel;
 import curry.stephen.tws.receiver.MyInvokeJsonWebServiceReceiver;
+import curry.stephen.tws.service.MyInvokeJsonWebService;
 import curry.stephen.tws.util.DateTimeHelper;
 import curry.stephen.tws.util.DividerItemDecoration;
 import curry.stephen.tws.util.JsonHelper;
@@ -264,9 +265,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     public boolean handleMessage(Message message) {
         if (message.what == MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER) {
-            Intent intent = new Intent();
-            intent.setAction(MyInvokeJsonWebServiceReceiver.ACTION_INVOKE_WEB_SERVICE);
-            MainActivity.this.sendBroadcast(intent);
+//            Intent intent = new Intent();
+//            intent.setAction(MyInvokeJsonWebServiceReceiver.ACTION_INVOKE_WEB_SERVICE);
+//            MainActivity.this.sendBroadcast(intent);
+            Intent intent = new Intent(this, MyInvokeJsonWebService.class);
+            intent.setAction(MyInvokeJsonWebService.ACTION_INVOKE_WEB_SERVICE);
+            startService(intent);
         }
 
         return true;

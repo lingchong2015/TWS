@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="curry.stephen.tws">
+<manifest package="curry.stephen.tws"
+          xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -8,7 +8,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
         <activity
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
@@ -16,10 +15,10 @@
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
+
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
@@ -31,11 +30,14 @@
             android:enabled="true"
             android:exported="false">
             <intent-filter>
-                <action
-                    android:name="curry.stephen.tws.service.my_service.action_invoke_web_service"/>
+                <action android:name="curry.stephen.tws.service.my_service.action_invoke_web_service"/>
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".service.MyInvokeJsonWebService"
+            android:enabled="true">
+        </service>
     </application>
 
 </manifest>

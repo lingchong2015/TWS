@@ -1,10 +1,10 @@
-package curry.stephen.tws.receiver;
+package curry.stephen.tws.service;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
+import android.app.Service;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
@@ -18,9 +18,8 @@ import curry.stephen.tws.util.ServerHelper;
 import curry.stephen.tws.webService.JsonWebService;
 import cz.msebera.android.httpclient.Header;
 
-public class MyInvokeJsonWebServiceReceiver extends BroadcastReceiver implements Handler.Callback {
+public class MyInvokeJsonWebService extends Service implements Handler.Callback {
 
-    private Context mContext;
     private String mLastResponseString = "";
     private Handler mHandler;
 
@@ -28,25 +27,38 @@ public class MyInvokeJsonWebServiceReceiver extends BroadcastReceiver implements
 
     public static final int MESSAGE_FOR_HANDLER = 1;
     public static final String ACTION_INVOKE_WEB_SERVICE = "curry.stephen.tws.service.my_service.action_invoke_web_service";
-    private static final String TAG = MyInvokeJsonWebServiceReceiver.class.getSimpleName();
+    private static final String TAG = MyInvokeJsonWebService.class.getSimpleName();
 
-    public MyInvokeJsonWebServiceReceiver() {
-        Log.i(TAG, "MyInvokeJsonWebServiceReceiver#MyInvokeJsonWebServiceReceiver()");
+    public MyInvokeJsonWebService() {
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Log.i(TAG, "MyInvokeJsonWebService#MyInvokeJsonWebService()");
         HandlerThread handlerThread = new HandlerThread(TAG);
         handlerThread.start();
         mHandler = new Handler(handlerThread.getLooper(), this);
     }
 
     @Override
-    public void onReceive(Context context, Intent intent) {
-        Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebServiceReceiver#onReceive():%d", Thread.currentThread().getId()));
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebService#onStartCommand():%d", Thread.currentThread().getId()));
 
-        mContext = context;
         if (intent.getAction().equals(ACTION_INVOKE_WEB_SERVICE)) {
             Message message = new Message();
             message.what = MESSAGE_FOR_HANDLER;
             mHandler.sendMessage(message);
         }
+
+        return START_NOT_STICKY;
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        // TODO: Return the communication channel to the service.
+        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     private void test1() {
@@ -65,7 +77,7 @@ public class MyInvokeJsonWebServiceReceiver extends BroadcastReceiver implements
         }
         ++testCounter;
 
-        mContext.sendBroadcast(intentReceiver);
+        sendBroadcast(intentReceiver);
     }
 
     private void invokeWebService() {
@@ -91,7 +103,7 @@ public class MyInvokeJsonWebServiceReceiver extends BroadcastReceiver implements
                     intentReceiver.putExtra(MainActivity.EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, responseString);
                 }
 
-                mContext.sendBroadcast(intentReceiver);
+                sendBroadcast(intentReceiver);
             }
 
             @Override
@@ -99,16 +111,16 @@ public class MyInvokeJsonWebServiceReceiver extends BroadcastReceiver implements
                 Log.i(TAG, "Get data failed.");
 
                 if (statusCode == 404) {
-                    Toast.makeText(mContext, "未找到请求资源,请查看网络连接地址是否设置正确.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MyInvokeJsonWebService.this, "未找到请求资源,请查看网络连接地址是否设置正确.", Toast.LENGTH_LONG).show();
                 } else if (statusCode == 500) {
-                    Toast.makeText(mContext, "服务器出现错误.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MyInvokeJsonWebService.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
                 } else {
-                    Toast.makeText(mContext, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MyInvokeJsonWebService.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG).show();
                 }
             }
         };
 
-        jsonWebService.invokeGetMethod(mContext, ServerHelper.getTransmitterDynamicInformationURI(), new RequestParams());
+        jsonWebService.invokeGetMethod(MyInvokeJsonWebService.this, ServerHelper.getTransmitterDynamicInformationURI(), new RequestParams());
     }
 
     @Override
