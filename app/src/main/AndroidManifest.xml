@@ -19,20 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activity.LoginActivity"
             android:label="@string/title_activity_login"
             android:screenOrientation="portrait">
         </activity>
-
-        <receiver
-            android:name=".receiver.MyInvokeJsonWebServiceReceiver"
-            android:enabled="true"
-            android:exported="false">
-            <intent-filter>
-                <action android:name="curry.stephen.tws.service.my_service.action_invoke_web_service"/>
-            </intent-filter>
-        </receiver>
 
         <service
             android:name=".service.MyInvokeJsonWebService"

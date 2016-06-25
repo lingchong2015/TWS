@@ -12,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Process;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -36,6 +35,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import curry.stephen.tws.R;
 import curry.stephen.tws.adapter.MyRecyclerViewAdapter;
@@ -43,7 +44,6 @@ import curry.stephen.tws.constant.GlobalVariables;
 import curry.stephen.tws.model.MyRecyclerViewModel;
 import curry.stephen.tws.model.TransmitterDynamicInformationModel;
 import curry.stephen.tws.model.TransmitterTotalInformationModel;
-import curry.stephen.tws.receiver.MyInvokeJsonWebServiceReceiver;
 import curry.stephen.tws.service.MyInvokeJsonWebService;
 import curry.stephen.tws.util.DateTimeHelper;
 import curry.stephen.tws.util.DividerItemDecoration;
@@ -65,7 +65,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     private String mLastTransmitterDynamicInformationJsonString = "";// Last json string received from server which used to display on UI when network is disconnected.
     private List<TransmitterTotalInformationModel> mTransmitterTotalInformationModelList = new ArrayList<>();// Transmitter total information model list parsed by json string return from server at first time.
     private List<TransmitterDynamicInformationModel> mLastTransmitterDynamicInformationModelList = new ArrayList<>();// Last Transmitter dynamic information list parsed by json string return from server at last time.
-    private Thread mThreadAlarm = null;// The alarm thread.
 
     private long mExitTime = 0;// Time to control whether to exit.
 
@@ -92,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     // Handler with main looper that handles message from mThreadAlarm, it is used to send broadcast to MyInvokeJsonWebServiceReceiver.
     private Handler mHandlerAlarm;
+    // Timer for alarm.
+    private Timer mTimerAlarm;
 
     // BroadcastReceiver for processing json string received from server and updating UI.
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
@@ -103,6 +104,17 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             } else if (intent.getAction().equals(ACTION_FRESH_DATETIME)) {
                 updateUIDatetime();
             }
+        }
+    };
+
+    // TimerTask as a alarm used to send message repeatedly or once to handlerMessage() method of current MainActivity instance(known as this).
+    private TimerTask mTimerTaskAlarm = new TimerTask() {
+        @Override
+        public void run() {
+            Log.i(TAG, String.format("Thread ID of MainActivity#mTimerTaskAlarm.run():%d.", Thread.currentThread().getId()));
+            Message message = new Message();
+            message.what = MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER;
+            mHandlerAlarm.sendMessage(message);
         }
     };
 
@@ -226,13 +238,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         if (!hasLogin()) {
             startLoginActivity();
+        } else {
+            initView();
+            initVariables();
+            initReceiver();
+            initRecyclerView();
         }
-
-        initView();
-        initVariables();
-        initReceiver();
-        initRecyclerView();
-
     }
 
     private void initView() {
@@ -264,10 +275,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public boolean handleMessage(Message message) {
+        Log.i(TAG, String.format("Thread ID of MainActivity#handleMessage():%d.", Thread.currentThread().getId()));
+
         if (message.what == MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER) {
-//            Intent intent = new Intent();
-//            intent.setAction(MyInvokeJsonWebServiceReceiver.ACTION_INVOKE_WEB_SERVICE);
-//            MainActivity.this.sendBroadcast(intent);
             Intent intent = new Intent(this, MyInvokeJsonWebService.class);
             intent.setAction(MyInvokeJsonWebService.ACTION_INVOKE_WEB_SERVICE);
             startService(intent);
@@ -304,6 +314,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void estimateLoginResult(int resultCode) {
         if (resultCode == 1) {
+            initView();
+            initVariables();
+            initReceiver();
+            initRecyclerView();
             Toast.makeText(this, "登录成功!", Toast.LENGTH_SHORT).show();
         } else {
             MainActivity.this.finish();
@@ -481,8 +495,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private void startAlarm() {
-        mThreadAlarm = new Thread(new AlarmThreadRunnable());
-        mThreadAlarm.start();
+        mTimerAlarm = new Timer(true);
+        mTimerAlarm.schedule(mTimerTaskAlarm, ALARM_INTERVAL, ALARM_INTERVAL);
     }
 
     @Override
@@ -505,12 +519,10 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         super.onDestroy();
         mHandlerAlarm.removeMessages(
                 MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER);
-        if (mThreadAlarm != null) {
-            if (mThreadAlarm.isAlive()) {
-                mThreadAlarm.interrupt();
-            }
-        }
         unregisterReceiver(mBroadcastReceiver);
+        mTimerTaskAlarm.cancel();
+        mTimerAlarm.cancel();
+        stopService(new Intent(this, MyInvokeJsonWebService.class));
         SharedPreferencesHelper.putString(this, GlobalVariables.LAST_TRANSMITTER_DYNAMIC_INFORMATION,
                 mLastTransmitterDynamicInformationJsonString);
         SharedPreferencesHelper.putString(this, GlobalVariables.TRANSMITTER_TOTAL_INFORMATION,
@@ -604,24 +616,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             mProgressBarNetworkDataProcessing.setVisibility(show ? View.VISIBLE : View.GONE);
             mTextViewNetWorkDataProcessing.setVisibility(show ? View.VISIBLE : View.GONE);
             mRecyclerView.setVisibility(show ? View.GONE : View.VISIBLE);
-        }
-    }
-
-    private class AlarmThreadRunnable implements Runnable {
-
-        @Override
-        public void run() {
-            while (true) {
-                try {
-                    Thread.sleep(ALARM_INTERVAL);
-
-                    Message message = new Message();
-                    message.what = MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER;
-                    mHandlerAlarm.sendMessage(message);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
         }
     }
 }

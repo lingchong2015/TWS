@@ -56,6 +56,13 @@ public class MyInvokeJsonWebService extends Service implements Handler.Callback 
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        Log.i(TAG, TAG + "#onDestroy()");
+    }
+
+    @Override
     public IBinder onBind(Intent intent) {
         // TODO: Return the communication channel to the service.
         throw new UnsupportedOperationException("Not yet implemented");
@@ -127,7 +134,7 @@ public class MyInvokeJsonWebService extends Service implements Handler.Callback 
     public boolean handleMessage(Message message) {
         switch (message.what) {
             case MESSAGE_FOR_HANDLER:
-                Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebServiceReceiver#handlerMessage():%d", Thread.currentThread()
+                Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebService#handlerMessage():%d", Thread.currentThread()
                         .getId()));
 //                invokeWebService();
                 test1();
