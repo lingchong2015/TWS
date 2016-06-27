@@ -7,7 +7,18 @@ import android.graphics.drawable.Drawable;
  */
 public class MyRecyclerViewModel {
 
-    private Drawable mDrawableStatus;
+    private Drawable mDrawableStatusGreen;
+    private Drawable mDrawableStatusRed;
+    private String mInfo;
+
+    public Drawable getDrawableStatusRed() {
+        return mDrawableStatusRed;
+    }
+
+    public void setDrawableStatusRed(Drawable drawableStatusRed) {
+        mDrawableStatusRed = drawableStatusRed;
+    }
+
     private String mTransmitterName;
 
     public String getInfo() {
@@ -26,13 +37,12 @@ public class MyRecyclerViewModel {
         mTransmitterName = transmitterName;
     }
 
-    public Drawable getDrawableStatus() {
-        return mDrawableStatus;
+    public Drawable getDrawableStatusGreen() {
+        return mDrawableStatusGreen;
     }
 
-    public void setDrawableStatus(Drawable drawableStatus) {
-        mDrawableStatus = drawableStatus;
+    public void setDrawableStatusGreen(Drawable drawableStatusGreen) {
+        mDrawableStatusGreen = drawableStatusGreen;
     }
 
-    private String mInfo;
 }

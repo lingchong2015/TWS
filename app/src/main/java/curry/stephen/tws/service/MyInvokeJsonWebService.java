@@ -166,8 +166,8 @@ public class MyInvokeJsonWebService extends Service implements Handler.Callback 
             case MESSAGE_FOR_HANDLER:
 //                Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebService#handlerMessage():%d", Thread.currentThread()
 //                        .getId()));
-//                invokeWebService();
-                test1();
+                invokeWebService();
+//                test1();
                 break;
         }
 

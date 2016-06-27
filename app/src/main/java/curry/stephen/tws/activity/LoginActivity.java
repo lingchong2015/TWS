@@ -141,8 +141,8 @@ public class LoginActivity extends AppCompatActivity {
             focusView.requestFocus();
         } else {
             Log.i(TAG, getUserInfoJsonString());
-//            invokeWebService(ServerHelper.getLoginURI(), new StringEntity(getUserInfoJsonString(), ContentType.APPLICATION_JSON));
-            test1();
+            invokeWebService(ServerHelper.getLoginURI(), new StringEntity(getUserInfoJsonString(), ContentType.APPLICATION_JSON));
+//            test1();
         }
     }
 

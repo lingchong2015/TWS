@@ -29,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.reflect.TypeToken;
-import com.loopj.android.http.RequestParams;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -61,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     // UI variables declaration.
     private RecyclerView mRecyclerView;
+    private Toolbar mToolbar;
     private ProgressBar mProgressBarNetworkDataProcessing;
     private TextView mTextViewNetWorkDataProcessing;
 
@@ -132,6 +132,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         ((MyRecyclerViewAdapter) mRecyclerView.getAdapter()).setMyRecyclerViewModelList(myRecyclerViewModelList);
         mRecyclerView.getAdapter().notifyDataSetChanged();
+
+        mToolbar.setSubtitle(String.format("更新时间: %s", DateTimeHelper.getDateTimeNow()));
+        mToolbar.setSubtitleTextAppearance(this, R.style.Theme_ToolBar_Base_Subtitle);
     }
 
     private void updateUIDatetime() {
@@ -152,35 +155,38 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             List<TransmitterDynamicInformationModel> transmitterDynamicInformationModelList) {
         List<MyRecyclerViewModel> myRecyclerViewModelList = new ArrayList<>();
 
-        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
-        myRecyclerViewModelSummary.setDrawableStatus(getResources().getDrawable(R.drawable.blue_ball));
-        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
-                R.string.transmitter_total_number_formatter),
-                String.valueOf(transmitterDynamicInformationModelList.size())));
-        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
+//        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
+//        myRecyclerViewModelSummary.setDrawableStatusGreen(getResources().getDrawable(R.drawable.blue_ball));
+//        myRecyclerViewModelSummary.setDrawableStatusRed(getResources().getDrawable(R.drawable.blue_ball));
+//        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
+//                R.string.transmitter_total_number_formatter),
+//                String.valueOf(transmitterDynamicInformationModelList.size())));
+//        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
 
-        int normalStatusNumber = 0;
-        for (TransmitterDynamicInformationModel transmitterModel : transmitterDynamicInformationModelList) {
+//        int normalStatusNumber = 0;
+        for (TransmitterDynamicInformationModel transmitterDynamicInformationModel : transmitterDynamicInformationModelList) {
             MyRecyclerViewModel myRecyclerViewModel = new MyRecyclerViewModel();
-            myRecyclerViewModel.setDrawableStatus(getResources().getDrawable(
-                    isTransmitterNormal(transmitterModel) ? R.drawable.green_ball : R.drawable.red_ball
+            myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(
+                    isTransmitterNormal(transmitterDynamicInformationModel) ? R.drawable.green_ball : R.drawable.green_ball_gray
             ));
+            myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(isTransmitterNormal(transmitterDynamicInformationModel) ?
+            R.drawable.red_ball_gray : R.drawable.red_ball));
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
-                    transmitter_name_formatter), transmitterModel.getName()));
+                    transmitter_name_formatter), transmitterDynamicInformationModel.getName()));
             myRecyclerViewModel.setInfo(String.format(getString(
                     R.string.transmitter_main_parameters_info_formatter),
-                    transmitterModel.getFrequency(), transmitterModel.getTransmission_power(),
-                    transmitterModel.getReflection_power()));
+                    transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                    transmitterDynamicInformationModel.getReflection_power()));
             myRecyclerViewModelList.add(myRecyclerViewModel);
 
-            if (isTransmitterNormal(transmitterModel)) {
-                ++normalStatusNumber;
-            }
+//            if (isTransmitterNormal(transmitterDynamicInformationModel)) {
+//                ++normalStatusNumber;
+//            }
         }
 
-        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
-                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
-                transmitterDynamicInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
+//        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
+//                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
+//                transmitterDynamicInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
 
         return myRecyclerViewModelList;
     }
@@ -189,19 +195,22 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             List<TransmitterTotalInformationModel> transmitterTotalInformationModelList) {
         List<MyRecyclerViewModel> myRecyclerViewModelList = new ArrayList<>();
 
-        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
-        myRecyclerViewModelSummary.setDrawableStatus(getResources().getDrawable(R.drawable.blue_ball));
-        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
-                R.string.transmitter_total_number_formatter),
-                String.valueOf(transmitterTotalInformationModelList.size())));
-        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
+//        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
+//        myRecyclerViewModelSummary.setDrawableStatusGreen(getResources().getDrawable(R.drawable.blue_ball));
+//        myRecyclerViewModelSummary.setDrawableStatusRed(getResources().getDrawable(R.drawable.blue_ball));
+//        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
+//                R.string.transmitter_total_number_formatter),
+//                String.valueOf(transmitterTotalInformationModelList.size())));
+//        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
 
-        int normalStatusNumber = 0;
+//        int normalStatusNumber = 0;
         for (TransmitterTotalInformationModel transmitterTotalInformationModel : transmitterTotalInformationModelList) {
             MyRecyclerViewModel myRecyclerViewModel = new MyRecyclerViewModel();
-            myRecyclerViewModel.setDrawableStatus(getResources().getDrawable(
-                    isTransmitterNormal(transmitterTotalInformationModel) ? R.drawable.green_ball : R.drawable.red_ball
+            myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(
+                    isTransmitterNormal(transmitterTotalInformationModel) ? R.drawable.green_ball : R.drawable.green_ball_gray
             ));
+            myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(isTransmitterNormal(transmitterTotalInformationModel) ?
+                    R.drawable.red_ball_gray : R.drawable.red_ball));
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
                     transmitter_name_formatter), transmitterTotalInformationModel.getName()));
             myRecyclerViewModel.setInfo(String.format(getString(
@@ -210,26 +219,26 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     transmitterTotalInformationModel.getReflection_power()));
             myRecyclerViewModelList.add(myRecyclerViewModel);
 
-            if (isTransmitterNormal(transmitterTotalInformationModel)) {
-                ++normalStatusNumber;
-            }
+//            if (isTransmitterNormal(transmitterTotalInformationModel)) {
+//                ++normalStatusNumber;
+//            }
         }
 
-        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
-                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
-                transmitterTotalInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
+//        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
+//                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
+//                transmitterTotalInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
 
         return myRecyclerViewModelList;
     }
 
     private boolean isTransmitterNormal(TransmitterDynamicInformationModel transmitterDynamicInformationModel) {
-//        return transmitterDynamicInformationModel.getStatus().equals("1") ? true : false;
-        return true;
+        return transmitterDynamicInformationModel.getStatus().equals("1") ? true : false;
+//        return true;
     }
 
     private boolean isTransmitterNormal(TransmitterTotalInformationModel transmitterTotalInformationModel) {
-//        return transmitterTotalInformationModel.getStatus().equals("1") ? true : false;
-        return true;
+        return transmitterTotalInformationModel.getStatus().equals("1") ? true : false;
+//        return true;
     }
 
     @Override
@@ -248,8 +257,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void initView() {
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mToolbar);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -361,33 +370,53 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this,
                 DividerItemDecoration.VERTICAL_LIST));
 
-//        invokeWebServiceFirstTime();
-        test1();
+        invokeWebServiceFirstTime();
+//        test1();
     }
 
     @Override
     public void onItemClick(View view, int position) {
-        if ((position > 0) && (position < mLastTransmitterDynamicInformationModelList.size() + 1)) {
-            TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position - 1);
+//        if ((position > 0) && (position < mLastTransmitterDynamicInformationModelList.size() + 1)) {
+//            TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position - 1);
+//
+//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+//            builder.setTitle("发射机信息");
+//
+//            builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                }
+//            });
+//
+//            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+//                @Override
+//                public void onClick(DialogInterface dialog, int which) {
+//                    dialog.dismiss();
+//                }
+//            });
+//
+//            builder.create().show();
+//        }
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-            builder.setTitle("发射机信息");
+        TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position);
 
-            builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("发射机信息");
 
-            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
+        builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        });
 
-            builder.create().show();
-        }
+        builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        builder.create().show();
     }
 
     private String[] generateDialogInformation(TransmitterDynamicInformationModel transmitterDynamicInformationModel,
@@ -413,6 +442,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 MainActivity.this, myRecyclerViewModelList);
         myRecyclerViewAdapter.setOnItemClickListener(MainActivity.this);
         mRecyclerView.setAdapter(myRecyclerViewAdapter);
+
+        mToolbar.setSubtitle(String.format("更新时间: %s", DateTimeHelper.getDateTimeNow()));
+        mToolbar.setSubtitleTextAppearance(this, R.style.Theme_ToolBar_Base_Subtitle);
 
         startAlarm();
     }
@@ -462,6 +494,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         MainActivity.this, myRecyclerViewModelList);
                 myRecyclerViewAdapter.setOnItemClickListener(MainActivity.this);
                 mRecyclerView.setAdapter(myRecyclerViewAdapter);
+
+                mToolbar.setSubtitle(String.format("更新时间: %s", DateTimeHelper.getDateTimeNow()));
+                mToolbar.setSubtitleTextAppearance(MainActivity.this, R.style.Theme_ToolBar_Base_Subtitle);
 
                 startAlarm();
             }

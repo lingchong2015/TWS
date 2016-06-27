@@ -64,10 +64,9 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             });
         }
 
-        holder.getImageViewStatus().setImageDrawable(mMyRecyclerViewModelList.get(position)
-                .getDrawableStatus());
-        holder.getTextViewTransmitterName().setText(mMyRecyclerViewModelList.get(position)
-                .getTransmitterName());
+        holder.getImageViewStatusGreen().setImageDrawable(mMyRecyclerViewModelList.get(position).getDrawableStatusGreen());
+        holder.getImageViewStatusRed().setImageDrawable(mMyRecyclerViewModelList.get(position).getDrawableStatusRed());
+        holder.getTextViewTransmitterName().setText(mMyRecyclerViewModelList.get(position).getTransmitterName());
         holder.getTextViewInfo().setText(mMyRecyclerViewModelList.get(position).getInfo());
     }
 
@@ -78,7 +77,8 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
     class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private ImageView mImageViewStatus;
+        private ImageView mImageViewStatusGreen;
+        private ImageView mImageViewStatusRed;
         private TextView mTextViewTransmitterName;
         private TextView mTextViewInfo;
 
@@ -92,12 +92,12 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         private View mRootView;
 
-        public ImageView getImageViewStatus() {
-            return mImageViewStatus;
+        public ImageView getImageViewStatusGreen() {
+            return mImageViewStatusGreen;
         }
 
-        public void setImageViewStatus(ImageView imageViewStatus) {
-            mImageViewStatus = imageViewStatus;
+        public void setImageViewStatusGreen(ImageView imageViewStatusGreen) {
+            mImageViewStatusGreen = imageViewStatusGreen;
         }
 
         public TextView getTextViewTransmitterName() {
@@ -116,11 +116,20 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             mTextViewInfo = textViewInfo;
         }
 
+        public ImageView getImageViewStatusRed() {
+            return mImageViewStatusRed;
+        }
+
+        public void setImageViewStatusRed(ImageView imageViewStatusRed) {
+            mImageViewStatusRed = imageViewStatusRed;
+        }
+
         public MyViewHolder(View view) {
             super(view);
 
             mRootView = view;
-            mImageViewStatus = (ImageView) view.findViewById(R.id.image_view_status);
+            mImageViewStatusGreen = (ImageView) view.findViewById(R.id.image_view_green_status);
+            mImageViewStatusRed = (ImageView) view.findViewById(R.id.image_view_red_status);
             mTextViewTransmitterName = (TextView) view.findViewById(R.id.text_view_transmitter_name);
             mTextViewInfo = (TextView) view.findViewById(R.id.text_view_info);
         }
