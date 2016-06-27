@@ -67,11 +67,11 @@ public class MD5Helper {
     }
 
     public static String getEncryptedPassword(String password) {
-        SecureRandom random = new SecureRandom();
-        byte[] salt = new byte[SALT_LENGTH];
-        random.nextBytes(salt);
-
+//        SecureRandom random = new SecureRandom();
+//        byte[] salt = new byte[SALT_LENGTH];
+//        random.nextBytes(salt);
         MessageDigest messageDigest = null;
+        byte[] salt = {-125, -109, 85, -26, -66, 98, 72, -74, 44, 82, -121, 5};
         try {
             messageDigest = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {

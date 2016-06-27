@@ -19,6 +19,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -31,9 +32,11 @@ import curry.stephen.tws.model.UserInfoModel;
 import curry.stephen.tws.util.JsonHelper;
 import curry.stephen.tws.util.MD5Helper;
 import curry.stephen.tws.util.SearchAdapter;
+import curry.stephen.tws.util.ServerHelper;
 import curry.stephen.tws.util.SharedPreferencesHelper;
 import curry.stephen.tws.webService.JsonWebService;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.ContentType;
 import cz.msebera.android.httpclient.entity.StringEntity;
 
 /**
@@ -137,6 +140,7 @@ public class LoginActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
+            Log.i(TAG, getUserInfoJsonString());
 //            invokeWebService(ServerHelper.getLoginURI(), new StringEntity(getUserInfoJsonString(), ContentType.APPLICATION_JSON));
             test1();
         }
@@ -237,13 +241,33 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {}
+            public void successPostCallBack(int statusCode, Header[] headers, JSONArray response) {
+            }
 
             @Override
-            public void failureGetCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {}
+            public void failurePostCallBack(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+            }
+
+            @Override
+            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failureGetCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            }
+
+            @Override
+            public void successPostCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failurePostCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+
+            }
         };
 
         showProgress(true);
+        Log.i(TAG, uri);
         jsonWebService.invokePostMethod(this, uri, stringEntity);
     }
 
@@ -273,7 +297,7 @@ public class LoginActivity extends AppCompatActivity {
 
         UserInfoModel userInfoModel = new UserInfoModel();
         userInfoModel.setUsername(username);
-        userInfoModel.setPassword(MD5Helper.getEncryptedPassword(password));
+        userInfoModel.setPassword(password);
         return JsonHelper.toJson(userInfoModel);
     }
 

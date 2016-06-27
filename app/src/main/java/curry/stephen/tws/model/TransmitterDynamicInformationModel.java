@@ -9,6 +9,15 @@ public class TransmitterDynamicInformationModel {
     private String frequency;
     private String transmission_power;
     private String reflection_power;
+    private String status;
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 
     public String getName() {
         return name;
@@ -43,7 +52,7 @@ public class TransmitterDynamicInformationModel {
     }
 
     public String[] getItemContent() {
-        String nameContent = String.format("编号:%s", name);
+        String nameContent = String.format("频道:%s", name);
         String frequencyContent = String.format("频率:%s", frequency);
         String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
         String reflectionPowerContent = String.format("反射功率:%s", reflection_power);

@@ -6,15 +6,15 @@ package curry.stephen.tws.util;
  */
 public class ServerHelper {
 
-    private static String defaultServerURL = "http://localhost:8080/";
+    private static String defaultServerURL = "http://192.168.8.103:8080/";
 
-    private static String currentServerURL = "http://localhost:8080/";
+    private static String currentServerURL = "http://192.168.8.103:8080/";
 
-    private static final String LOGIN = "servlet/mLogin";
+    private static final String LOGIN = "RFSignalMonitorSystem/servlet/UserLogin";
 
-    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "servlet/transmitterDynamicInformation";
+    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
 
-    private static final String TRANSMITTER_TOTAL_INFORMATION = "servlet/transmitterTotalInformation";
+    private static final String TRANSMITTER_TOTAL_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
 
     public static String getDefaultServerURL() {
         return defaultServerURL;

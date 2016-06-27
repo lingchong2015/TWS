@@ -11,12 +11,15 @@ import android.widget.Toast;
 
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import curry.stephen.tws.activity.MainActivity;
 import curry.stephen.tws.util.ServerHelper;
 import curry.stephen.tws.webService.JsonWebService;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.ContentType;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class MyInvokeJsonWebService extends Service implements Handler.Callback {
 
@@ -58,6 +61,9 @@ public class MyInvokeJsonWebService extends Service implements Handler.Callback 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (mHandler != null) {
+            mHandler.removeMessages(MESSAGE_FOR_HANDLER);
+        }
 
         Log.i(TAG, TAG + "#onDestroy()");
     }
@@ -98,44 +104,68 @@ public class MyInvokeJsonWebService extends Service implements Handler.Callback 
             }
 
             @Override
-            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {
+            public void successPostCallBack(int statusCode, Header[] headers, JSONArray response) {
                 Log.i(TAG, "Get data successfully.");
 
+                String responseString = response.toString();
+
                 Intent intentReceiver = new Intent();
-                if (mLastResponseString.equals(responseString)) {
-                    intentReceiver.setAction(MainActivity.ACTION_FRESH_DATETIME);
-                } else {
-                    mLastResponseString = responseString;
-                    intentReceiver.setAction(MainActivity.ACTION_FRESH_INFO);
-                    intentReceiver.putExtra(MainActivity.EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, responseString);
-                }
+//                if (mLastResponseString.equals(responseString)) {
+//                    intentReceiver.setAction(MainActivity.ACTION_FRESH_INFO);
+//                } else {
+//                    mLastResponseString = responseString;
+//                    intentReceiver.setAction(MainActivity.ACTION_FRESH_INFO);
+//                    intentReceiver.putExtra(MainActivity.EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, responseString);
+//                }
+
+                mLastResponseString = responseString;
+                intentReceiver.setAction(MainActivity.ACTION_FRESH_INFO);
+                intentReceiver.putExtra(MainActivity.EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, responseString);
 
                 sendBroadcast(intentReceiver);
             }
 
             @Override
-            public void failureGetCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            public void failurePostCallBack(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 Log.i(TAG, "Get data failed.");
 
                 if (statusCode == 404) {
-                    Toast.makeText(MyInvokeJsonWebService.this, "未找到请求资源,请查看网络连接地址是否设置正确.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(MyInvokeJsonWebService.this, "未找到请求资源,请查看网络连接地址是否设置正确.",
+                            Toast.LENGTH_LONG).show();
                 } else if (statusCode == 500) {
                     Toast.makeText(MyInvokeJsonWebService.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
                 } else {
                     Toast.makeText(MyInvokeJsonWebService.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG).show();
                 }
             }
+
+            @Override
+            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failureGetCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            }
+
+            @Override
+            public void successPostCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failurePostCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            }
         };
 
-        jsonWebService.invokeGetMethod(MyInvokeJsonWebService.this, ServerHelper.getTransmitterDynamicInformationURI(), new RequestParams());
+        jsonWebService.invokePostMethod(MyInvokeJsonWebService.this, ServerHelper.getTransmitterDynamicInformationURI(),
+                new StringEntity("null", ContentType.APPLICATION_JSON));
     }
 
     @Override
     public boolean handleMessage(Message message) {
         switch (message.what) {
             case MESSAGE_FOR_HANDLER:
-                Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebService#handlerMessage():%d", Thread.currentThread()
-                        .getId()));
+//                Log.i(TAG, String.format("Thread ID of MyInvokeJsonWebService#handlerMessage():%d", Thread.currentThread()
+//                        .getId()));
 //                invokeWebService();
                 test1();
                 break;

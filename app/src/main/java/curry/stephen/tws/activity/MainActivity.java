@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.google.gson.reflect.TypeToken;
 import com.loopj.android.http.RequestParams;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -52,6 +53,8 @@ import curry.stephen.tws.util.ServerHelper;
 import curry.stephen.tws.util.SharedPreferencesHelper;
 import curry.stephen.tws.webService.JsonWebService;
 import cz.msebera.android.httpclient.Header;
+import cz.msebera.android.httpclient.entity.ContentType;
+import cz.msebera.android.httpclient.entity.StringEntity;
 
 public class MainActivity extends AppCompatActivity implements Handler.Callback,
         MyRecyclerViewAdapter.OnItemClickListener {
@@ -79,13 +82,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     public static final String EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO = "extrasForReceiverTransmitterModelList";
 
     // Constant variables for alarm.
-    private static final int ALARM_INTERVAL = 550;
+    private static final int ALARM_INTERVAL = 5500;
     public static final int MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER = 1;
-
-    // Constant variables for threshold of main transmitter parameters.
-    private static final int FREQUENCY = 100;
-    private static final int TRANSMISSION_POWER = 100;
-    private static final int REFLECTION_POWER = 100;
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -100,9 +98,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(ACTION_FRESH_INFO)) {
                 String responseJsonString = intent.getStringExtra(EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO);
+//                if (responseJsonString != null) {
+//                    updateUIInfo(responseJsonString);
+//                } else {
+//                    updateUIDatetime();
+//                }
+
                 updateUIInfo(responseJsonString);
-            } else if (intent.getAction().equals(ACTION_FRESH_DATETIME)) {
-                updateUIDatetime();
             }
         }
     };
@@ -221,15 +223,13 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private boolean isTransmitterNormal(TransmitterDynamicInformationModel transmitterDynamicInformationModel) {
-        return (Integer.valueOf(transmitterDynamicInformationModel.getFrequency()) >= FREQUENCY) &&
-                (Integer.valueOf(transmitterDynamicInformationModel.getTransmission_power()) >= TRANSMISSION_POWER) &&
-                (Integer.valueOf(transmitterDynamicInformationModel.getReflection_power()) >= REFLECTION_POWER);
+//        return transmitterDynamicInformationModel.getStatus().equals("1") ? true : false;
+        return true;
     }
 
     private boolean isTransmitterNormal(TransmitterTotalInformationModel transmitterTotalInformationModel) {
-        return (Integer.valueOf(transmitterTotalInformationModel.getFrequency()) >= FREQUENCY) &&
-                (Integer.valueOf(transmitterTotalInformationModel.getTransmission_power()) >= TRANSMISSION_POWER) &&
-                (Integer.valueOf(transmitterTotalInformationModel.getReflection_power()) >= REFLECTION_POWER);
+//        return transmitterTotalInformationModel.getStatus().equals("1") ? true : false;
+        return true;
     }
 
     @Override
@@ -368,18 +368,12 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     public void onItemClick(View view, int position) {
         if ((position > 0) && (position < mLastTransmitterDynamicInformationModelList.size() + 1)) {
-//            TransmitterTotalInformationModel transmitterTotalInformationModel = mTransmitterTotalInformationModelList.get(position - 1);
             TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position - 1);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("发射机信息");
 
-//            String[] itemContents = generateDialogInformation(transmitterDynamicInformationModel,
-//                    transmitterTotalInformationModel);
-
-            String[] testVariable1 = transmitterDynamicInformationModel.getItemContent();
-
-            builder.setItems(testVariable1, new DialogInterface.OnClickListener() {
+            builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                 }
@@ -427,17 +421,25 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         JsonWebService jsonWebService = new JsonWebService() {
             @Override
             public void successPostCallBack(int statusCode, Header[] headers, JSONObject jsonObject) {
+                Log.i(TAG, "Get data successfully.");
+
+                showProgress(false);
             }
 
             @Override
             public void failurePostCallBack(int statusCode, Header[] headers, Throwable throwable, JSONObject jsonObject) {
+                Log.i(TAG, "Get data failed.");
+
+                showProgress(false);
             }
 
             @Override
-            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {
+            public void successPostCallBack(int statusCode, Header[] headers, JSONArray response) {
                 Log.i(TAG, "Get data successfully.");
 
                 showProgress(false);
+
+                String responseString = response.toString();
 
                 mTransmitterTotalInformationJsonString = responseString;
                 List<TransmitterTotalInformationModel> transmitterTotalInformationModelList = JsonHelper.
@@ -445,6 +447,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                                 TypeToken<List<TransmitterTotalInformationModel>>() {
                                 }.getType());
                 mTransmitterTotalInformationModelList = transmitterTotalInformationModelList;
+
+                mLastTransmitterDynamicInformationJsonString = responseString;
+                List<TransmitterDynamicInformationModel> transmitterDynamicInformationModelList = JsonHelper.
+                        <List<TransmitterDynamicInformationModel>>fromJson(responseString, new
+                                TypeToken<List<TransmitterDynamicInformationModel>>() {
+                                }.getType());
+                mLastTransmitterDynamicInformationModelList = transmitterDynamicInformationModelList;
+
                 List<MyRecyclerViewModel> myRecyclerViewModelList =
                         transmitterTotalInformationModelListToMyRecyclerViewModelList(transmitterTotalInformationModelList);
 
@@ -457,8 +467,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             }
 
             @Override
-            public void failureGetCallBack(int statusCode, Header[] headers, String responseString,
-                                           Throwable throwable) {
+            public void failurePostCallBack(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
                 Log.i(TAG, "Get data failed.");
 
                 showProgress(false);
@@ -487,11 +496,28 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                             .show();
                 }
             }
+
+            @Override
+            public void successGetCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failureGetCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            }
+
+            @Override
+            public void successPostCallBack(int statusCode, Header[] headers, String responseString) {
+            }
+
+            @Override
+            public void failurePostCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+            }
         };
 
         showProgress(true);
 
-        jsonWebService.invokeGetMethod(this, ServerHelper.getTransmitterTotalInformationURI(), new RequestParams());
+        jsonWebService.invokePostMethod(this, ServerHelper.getTransmitterTotalInformationURI(), new StringEntity("null",
+                ContentType.APPLICATION_JSON));
     }
 
     private void startAlarm() {
@@ -517,11 +543,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mHandlerAlarm.removeMessages(
-                MESSAGE_FOR_SEND_BROADCAST_TO_MY_INVOKE_JSON_WEB_SERVICE_RECEIVER);
         unregisterReceiver(mBroadcastReceiver);
         mTimerTaskAlarm.cancel();
-        mTimerAlarm.cancel();
         stopService(new Intent(this, MyInvokeJsonWebService.class));
         SharedPreferencesHelper.putString(this, GlobalVariables.LAST_TRANSMITTER_DYNAMIC_INFORMATION,
                 mLastTransmitterDynamicInformationJsonString);
