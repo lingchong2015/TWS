@@ -578,7 +578,16 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(mBroadcastReceiver);
+
+        try {
+            unregisterReceiver(mBroadcastReceiver);
+        } catch (Exception e) {
+            if (e.getMessage().contains("Receiver not registered")) {
+                // Ignore this exception.
+            } else {
+                throw e;
+            }
+        }
         mTimerTaskAlarm.cancel();
         stopService(new Intent(this, MyInvokeJsonWebService.class));
         SharedPreferencesHelper.putString(this, GlobalVariables.LAST_TRANSMITTER_DYNAMIC_INFORMATION,
@@ -607,6 +616,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     private void menuActionExitHandler() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
         builder.setTitle("询  问");
 
         builder.setItems(new String[]{"是否确定退出?"}, new DialogInterface.OnClickListener() {

@@ -246,6 +246,19 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void failurePostCallBack(int statusCode, Header[] headers, Throwable throwable, JSONArray errorResponse) {
+                Log.i(TAG, "Network communication failed.");
+
+                showProgress(false);
+
+                setResult(MainActivity.RESULT_CODE_FOR_LOGIN_ACTIVITY_FALSE);
+
+                if (statusCode == 404) {
+                    Toast.makeText(LoginActivity.this, "未找到请求资源,请查看网络连接地址是否设置正确.", Toast.LENGTH_LONG).show();
+                } else if (statusCode == 500) {
+                    Toast.makeText(LoginActivity.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
@@ -262,6 +275,19 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void failurePostCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.i(TAG, "Network communication failed.");
+
+                showProgress(false);
+
+                setResult(MainActivity.RESULT_CODE_FOR_LOGIN_ACTIVITY_FALSE);
+
+                if (statusCode == 404) {
+                    Toast.makeText(LoginActivity.this, "未找到请求资源,请查看网络连接地址是否设置正确.", Toast.LENGTH_LONG).show();
+                } else if (statusCode == 500) {
+                    Toast.makeText(LoginActivity.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(LoginActivity.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG).show();
+                }
 
             }
         };
