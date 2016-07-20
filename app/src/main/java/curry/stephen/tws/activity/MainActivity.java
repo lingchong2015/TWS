@@ -34,9 +34,13 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import curry.stephen.tws.R;
 import curry.stephen.tws.adapter.MyRecyclerViewAdapter;
@@ -126,9 +130,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         List<TransmitterDynamicInformationModel> transmitterModelList = JsonHelper.<List<TransmitterDynamicInformationModel>>fromJson(responseJsonString,
                 new TypeToken<List<TransmitterDynamicInformationModel>>() {
                 }.getType());
-        mLastTransmitterDynamicInformationModelList = transmitterModelList;
         List<MyRecyclerViewModel> myRecyclerViewModelList =
                 transmitterDynamicInformationModelListToMyRecyclerViewModelList(transmitterModelList);
+        mLastTransmitterDynamicInformationModelList = transmitterModelList;
 
         ((MyRecyclerViewAdapter) mRecyclerView.getAdapter()).setMyRecyclerViewModelList(myRecyclerViewModelList);
         mRecyclerView.getAdapter().notifyDataSetChanged();
@@ -155,38 +159,66 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             List<TransmitterDynamicInformationModel> transmitterDynamicInformationModelList) {
         List<MyRecyclerViewModel> myRecyclerViewModelList = new ArrayList<>();
 
-//        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
-//        myRecyclerViewModelSummary.setDrawableStatusGreen(getResources().getDrawable(R.drawable.blue_ball));
-//        myRecyclerViewModelSummary.setDrawableStatusRed(getResources().getDrawable(R.drawable.blue_ball));
-//        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
-//                R.string.transmitter_total_number_formatter),
-//                String.valueOf(transmitterDynamicInformationModelList.size())));
-//        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapNormal = new HashMap<>();
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapTrouble = new HashMap<>();
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapStop = new HashMap<>();
 
-//        int normalStatusNumber = 0;
+        labeledTransmitterDynamicInformationModelTag(transmitterDynamicInformationModelList);
+
         for (TransmitterDynamicInformationModel transmitterDynamicInformationModel : transmitterDynamicInformationModelList) {
             MyRecyclerViewModel myRecyclerViewModel = new MyRecyclerViewModel();
-            myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(
-                    isTransmitterNormal(transmitterDynamicInformationModel) ? R.drawable.green_ball : R.drawable.green_ball_gray
-            ));
-            myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(isTransmitterNormal(transmitterDynamicInformationModel) ?
-            R.drawable.red_ball_gray : R.drawable.red_ball));
+
+            myRecyclerViewModel.setUUID(transmitterDynamicInformationModel.getUUID());
+
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
                     transmitter_name_formatter), transmitterDynamicInformationModel.getName()));
-            myRecyclerViewModel.setInfo(String.format(getString(
-                    R.string.transmitter_main_parameters_info_formatter),
-                    transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
-                    transmitterDynamicInformationModel.getReflection_power()));
-            myRecyclerViewModelList.add(myRecyclerViewModel);
 
-//            if (isTransmitterNormal(transmitterDynamicInformationModel)) {
-//                ++normalStatusNumber;
-//            }
+            if (getTransmitterStatus(transmitterDynamicInformationModel) == 0) {
+                myRecyclerViewModel.setInfo(String.format(getString(
+                        R.string.transmitter_main_parameters_info_formatter),
+                        transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                        transmitterDynamicInformationModel.getReflection_power()));
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
+                myRecyclerViewModelMapNormal.put(transmitterDynamicInformationModel.getId(), myRecyclerViewModel);
+            } else if (getTransmitterStatus(transmitterDynamicInformationModel) == 1) {
+                myRecyclerViewModel.setInfo(String.format(getString(
+                        R.string.transmitter_main_parameters_info_formatter),
+                        transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                        transmitterDynamicInformationModel.getReflection_power()));
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
+                myRecyclerViewModelMapTrouble.put(transmitterDynamicInformationModel.getId(), myRecyclerViewModel);
+            } else {
+                myRecyclerViewModel.setInfo(transmitterDynamicInformationModel.getTransmission_power());
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball_gray));
+                myRecyclerViewModelMapStop.put(transmitterDynamicInformationModel.getId(), myRecyclerViewModel);
+            }
         }
 
-//        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
-//                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
-//                transmitterDynamicInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
+        Integer[] normalKeys = myRecyclerViewModelMapNormal.keySet().toArray(new Integer[myRecyclerViewModelMapNormal.size()]);
+        Integer[] troubleKeys = myRecyclerViewModelMapTrouble.keySet().toArray(new Integer[myRecyclerViewModelMapTrouble.size()]);
+        Integer[] stopKeys = myRecyclerViewModelMapStop.keySet().toArray(new Integer[myRecyclerViewModelMapStop.size()]);
+
+        Arrays.sort(normalKeys);
+        Arrays.sort(troubleKeys);
+        Arrays.sort(stopKeys);
+
+        for (Integer key : troubleKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapTrouble.get(key));
+        }
+
+        for (Integer key : normalKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapNormal.get(key));
+        }
+
+        for (Integer key : stopKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapStop.get(key));
+        }
 
         return myRecyclerViewModelList;
     }
@@ -195,50 +227,120 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             List<TransmitterTotalInformationModel> transmitterTotalInformationModelList) {
         List<MyRecyclerViewModel> myRecyclerViewModelList = new ArrayList<>();
 
-//        MyRecyclerViewModel myRecyclerViewModelSummary = new MyRecyclerViewModel();
-//        myRecyclerViewModelSummary.setDrawableStatusGreen(getResources().getDrawable(R.drawable.blue_ball));
-//        myRecyclerViewModelSummary.setDrawableStatusRed(getResources().getDrawable(R.drawable.blue_ball));
-//        myRecyclerViewModelSummary.setTransmitterName(String.format(getString(
-//                R.string.transmitter_total_number_formatter),
-//                String.valueOf(transmitterTotalInformationModelList.size())));
-//        myRecyclerViewModelList.add(myRecyclerViewModelSummary);
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapNormal = new HashMap<>();
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapTrouble = new HashMap<>();
+        Map<Integer, MyRecyclerViewModel> myRecyclerViewModelMapStop = new HashMap<>();
 
-//        int normalStatusNumber = 0;
+        labeledTransmitterTotalInformationModelTag(transmitterTotalInformationModelList);
+
         for (TransmitterTotalInformationModel transmitterTotalInformationModel : transmitterTotalInformationModelList) {
             MyRecyclerViewModel myRecyclerViewModel = new MyRecyclerViewModel();
-            myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(
-                    isTransmitterNormal(transmitterTotalInformationModel) ? R.drawable.green_ball : R.drawable.green_ball_gray
-            ));
-            myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(isTransmitterNormal(transmitterTotalInformationModel) ?
-                    R.drawable.red_ball_gray : R.drawable.red_ball));
+
+            myRecyclerViewModel.setUUID(transmitterTotalInformationModel.getUUID());
+
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
                     transmitter_name_formatter), transmitterTotalInformationModel.getName()));
-            myRecyclerViewModel.setInfo(String.format(getString(
-                    R.string.transmitter_main_parameters_info_formatter),
-                    transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
-                    transmitterTotalInformationModel.getReflection_power()));
-            myRecyclerViewModelList.add(myRecyclerViewModel);
 
-//            if (isTransmitterNormal(transmitterTotalInformationModel)) {
-//                ++normalStatusNumber;
-//            }
+            if (getTransmitterStatus(transmitterTotalInformationModel) == 0) {
+                myRecyclerViewModel.setInfo(String.format(getString(
+                        R.string.transmitter_main_parameters_info_formatter),
+                        transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                        transmitterTotalInformationModel.getReflection_power()));
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
+                myRecyclerViewModelMapNormal.put(transmitterTotalInformationModel.getId(), myRecyclerViewModel);
+            } else if (getTransmitterStatus(transmitterTotalInformationModel) == 1) {
+                myRecyclerViewModel.setInfo(String.format(getString(
+                        R.string.transmitter_main_parameters_info_formatter),
+                        transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                        transmitterTotalInformationModel.getReflection_power()));
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
+                myRecyclerViewModelMapTrouble.put(transmitterTotalInformationModel.getId(), myRecyclerViewModel);
+            } else {
+                myRecyclerViewModel.setInfo(transmitterTotalInformationModel.getTransmission_power());
+                myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
+                myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
+                myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball_gray));
+                myRecyclerViewModelMapStop.put(transmitterTotalInformationModel.getId(), myRecyclerViewModel);
+            }
         }
 
-//        myRecyclerViewModelList.get(0).setInfo(String.format(getString(
-//                R.string.transmitter_status_statistics_formatter), normalStatusNumber,
-//                transmitterTotalInformationModelList.size() - normalStatusNumber, DateTimeHelper.getDateTimeNow()));
+        Integer[] normalKeys = myRecyclerViewModelMapNormal.keySet().toArray(new Integer[myRecyclerViewModelMapNormal.size()]);
+        Integer[] troubleKeys = myRecyclerViewModelMapTrouble.keySet().toArray(new Integer[myRecyclerViewModelMapTrouble.size()]);
+        Integer[] stopKeys = myRecyclerViewModelMapStop.keySet().toArray(new Integer[myRecyclerViewModelMapStop.size()]);
+
+        Arrays.sort(normalKeys);
+        Arrays.sort(troubleKeys);
+        Arrays.sort(stopKeys);
+
+        for (Integer key : troubleKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapTrouble.get(key));
+        }
+
+        for (Integer key : normalKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapNormal.get(key));
+        }
+
+        for (Integer key : stopKeys) {
+            myRecyclerViewModelList.add(myRecyclerViewModelMapStop.get(key));
+        }
 
         return myRecyclerViewModelList;
     }
 
-    private boolean isTransmitterNormal(TransmitterDynamicInformationModel transmitterDynamicInformationModel) {
-        return transmitterDynamicInformationModel.getStatus().equals("1") ? true : false;
-//        return true;
+    private void labeledTransmitterTotalInformationModelTag(
+            List<TransmitterTotalInformationModel> transmitterTotalInformationModelList) {
+        for (TransmitterTotalInformationModel transmitterTotalInformationModel :
+                transmitterTotalInformationModelList) {
+            transmitterTotalInformationModel.setUUID(UUID.randomUUID());
+        }
     }
 
-    private boolean isTransmitterNormal(TransmitterTotalInformationModel transmitterTotalInformationModel) {
-        return transmitterTotalInformationModel.getStatus().equals("1") ? true : false;
-//        return true;
+    private void labeledTransmitterDynamicInformationModelTag(
+            List<TransmitterDynamicInformationModel> transmitterDynamicInformationModelList) {
+        for (TransmitterDynamicInformationModel transmitterDynamicInformationModel :
+                transmitterDynamicInformationModelList) {
+            transmitterDynamicInformationModel.setUUID(UUID.randomUUID());
+        }
+    }
+
+    /**
+     * 1: 发射机正常.<br/>
+     * 2: 发射机故障.<br/>
+     * 3: 发射机停止.
+     */
+    private int getTransmitterStatus(TransmitterDynamicInformationModel transmitterDynamicInformationModel) {
+        switch (transmitterDynamicInformationModel.getStatus()) {
+            case "1":
+                return 0;
+            case "2":
+                return 1;
+            case "3":
+                return 2;
+            default:
+                return 1;
+        }
+    }
+
+    /**
+     * 1: 发射机正常.<br/>
+     * 2: 发射机故障.<br/>
+     * 3: 发射机停止.
+     */
+    private int getTransmitterStatus(TransmitterTotalInformationModel transmitterTotalInformationModel) {
+        switch (transmitterTotalInformationModel.getStatus()) {
+            case "1":
+                return 0;
+            case "2":
+                return 1;
+            case "3":
+                return 2;
+            default:
+                return 1;
+        }
     }
 
     @Override
@@ -355,7 +457,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
     }
 
     private String[] getItemContent() {
-        return new String[]{"绿色：发射机工作处于正常状态", "红色：发射机工作处于故障状态"};
+        return new String[]{"绿色：发射机工作处于正常状态", "红色：发射机工作处于故障状态", "白色: 发射机工作处于暂停或关闭状态"};
     }
 
     private void initReceiver() {
@@ -376,34 +478,21 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
     @Override
     public void onItemClick(View view, int position) {
-//        if ((position > 0) && (position < mLastTransmitterDynamicInformationModelList.size() + 1)) {
-//            TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position - 1);
-//
-//            AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//            builder.setTitle("发射机信息");
-//
-//            builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                }
-//            });
-//
-//            builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
-//                @Override
-//                public void onClick(DialogInterface dialog, int which) {
-//                    dialog.dismiss();
-//                }
-//            });
-//
-//            builder.create().show();
-//        }
 
-        TransmitterDynamicInformationModel transmitterDynamicInformationModel = mLastTransmitterDynamicInformationModelList.get(position);
+        String uuid = ((MyRecyclerViewAdapter) mRecyclerView.getAdapter()).getMyRecyclerViewModelList().get(position).getUUID().toString();
+
+        TransmitterDynamicInformationModel transmitterDynamicInformationModelSelected = null;
+
+        for (TransmitterDynamicInformationModel transmitterDynamicInformationModel : mLastTransmitterDynamicInformationModelList) {
+            if (transmitterDynamicInformationModel.getUUID().toString().equals(uuid)) {
+                transmitterDynamicInformationModelSelected = transmitterDynamicInformationModel;
+            }
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("发射机信息");
 
-        builder.setItems(transmitterDynamicInformationModel.getItemContent(), new DialogInterface.OnClickListener() {
+        builder.setItems(transmitterDynamicInformationModelSelected.getItemContent(), new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
@@ -419,13 +508,8 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         builder.create().show();
     }
 
-    private String[] generateDialogInformation(TransmitterDynamicInformationModel transmitterDynamicInformationModel,
-                                               TransmitterTotalInformationModel transmitterTotalInformationModel) {
-        return null;
-    }
-
     private void test1() {
-        String responseString = "[{\"frequency\":\"100\",\"name\":\"001\",\"reflection_power\":\"100\",\"transmission_power\":\"100\"},{\"frequency\":\"100\",\"name\":\"002\",\"reflection_power\":\"200\",\"transmission_power\":\"130\"},{\"frequency\":\"99\",\"name\":\"003\",\"reflection_power\":\"130\",\"transmission_power\":\"100\"}]";
+        String responseString = "[{\"frequency\":\"100\",\"name\":\"001\",\"reflection_power\":\"100\",\"transmission_power\":\"数据暂无更新，请检查连接是否正常\",\"status\":\"2\",\"info\":\"111\",\"number\":\"2\"},{\"frequency\":\"100\",\"name\":\"002\",\"reflection_power\":\"200\",\"transmission_power\":\"发射机处于关闭状态\",\"status\":\"2\",\"info\":\"111\",\"number\":\"3\"},{\"frequency\":\"99\",\"name\":\"003\",\"reflection_power\":\"130\",\"transmission_power\":\"100\",\"status\":\"0\",\"info\":\"111\",\"number\":\"2\"}]";
 
         Log.i(TAG, responseString);
 
@@ -463,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Log.i(TAG, "Get data failed.");
 
                 showProgress(false);
+                showProgress(false);
             }
 
             @Override
@@ -485,10 +570,14 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                         <List<TransmitterDynamicInformationModel>>fromJson(responseString, new
                                 TypeToken<List<TransmitterDynamicInformationModel>>() {
                                 }.getType());
-                mLastTransmitterDynamicInformationModelList = transmitterDynamicInformationModelList;
 
+//                List<MyRecyclerViewModel> myRecyclerViewModelList =
+//                        transmitterTotalInformationModelListToMyRecyclerViewModelList(transmitterTotalInformationModelList);
                 List<MyRecyclerViewModel> myRecyclerViewModelList =
-                        transmitterTotalInformationModelListToMyRecyclerViewModelList(transmitterTotalInformationModelList);
+                        transmitterDynamicInformationModelListToMyRecyclerViewModelList(
+                                transmitterDynamicInformationModelList
+                        );
+                mLastTransmitterDynamicInformationModelList = transmitterDynamicInformationModelList;
 
                 MyRecyclerViewAdapter myRecyclerViewAdapter = new MyRecyclerViewAdapter(
                         MainActivity.this, myRecyclerViewModelList);

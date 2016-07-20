@@ -1,5 +1,7 @@
 package curry.stephen.tws.model;
 
+import java.util.UUID;
+
 /**
  * Created by LingChong on 2016/6/24 0024.
  */
@@ -10,6 +12,42 @@ public class TransmitterTotalInformationModel {
     private String transmission_power;
     private String reflection_power;
     private String status;
+    private String note;
+    private int id;
+    private UUID mUUID;
+    private String info;
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
+    public UUID getUUID() {
+        return mUUID;
+    }
+
+    public void setUUID(UUID UUID) {
+        mUUID = UUID;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
 
     public String getStatus() {
         return status;
@@ -53,11 +91,20 @@ public class TransmitterTotalInformationModel {
 
     public String[] getItemContent() {
         String nameContent = String.format("频道:%s", name);
+
+        if (transmission_power.equals("数据暂无更新，请检查连接是否正常") ||
+                transmission_power.equals("发射机处于关闭状态")) {
+            return new String[]{nameContent, transmission_power, "备注:" + note};
+        } else if (status.equals("1")) {
+            return new String[]{nameContent, "报警信息:" + info};
+        }
+
         String frequencyContent = String.format("频率:%s", frequency);
         String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
         String reflectionPowerContent = String.format("反射功率:%s", reflection_power);
+        String timeInfo = String.format("备注:%s", note);
 
-        return new String[] {nameContent, frequencyContent, transmissionPowerContent,
-                reflectionPowerContent};
+        return new String[]{nameContent, frequencyContent, transmissionPowerContent,
+                reflectionPowerContent, timeInfo};
     }
 }

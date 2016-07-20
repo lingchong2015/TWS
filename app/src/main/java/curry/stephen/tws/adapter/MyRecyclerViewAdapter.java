@@ -66,6 +66,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         holder.getImageViewStatusGreen().setImageDrawable(mMyRecyclerViewModelList.get(position).getDrawableStatusGreen());
         holder.getImageViewStatusRed().setImageDrawable(mMyRecyclerViewModelList.get(position).getDrawableStatusRed());
+        holder.getImageViewStatusWhite().setImageDrawable(mMyRecyclerViewModelList.get(position).getDrawableStatusWhite());
         holder.getTextViewTransmitterName().setText(mMyRecyclerViewModelList.get(position).getTransmitterName());
         holder.getTextViewInfo().setText(mMyRecyclerViewModelList.get(position).getInfo());
     }
@@ -79,6 +80,16 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
 
         private ImageView mImageViewStatusGreen;
         private ImageView mImageViewStatusRed;
+        private ImageView mImageViewStatusWhite;
+
+        public ImageView getImageViewStatusWhite() {
+            return mImageViewStatusWhite;
+        }
+
+        public void setImageViewStatusWhite(ImageView imageViewStatusWhite) {
+            mImageViewStatusWhite = imageViewStatusWhite;
+        }
+
         private TextView mTextViewTransmitterName;
         private TextView mTextViewInfo;
 
@@ -130,6 +141,7 @@ public class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyRecyclerViewAd
             mRootView = view;
             mImageViewStatusGreen = (ImageView) view.findViewById(R.id.image_view_green_status);
             mImageViewStatusRed = (ImageView) view.findViewById(R.id.image_view_red_status);
+            mImageViewStatusWhite = (ImageView) view.findViewById(R.id.image_view_white_status);
             mTextViewTransmitterName = (TextView) view.findViewById(R.id.text_view_transmitter_name);
             mTextViewInfo = (TextView) view.findViewById(R.id.text_view_info);
         }
