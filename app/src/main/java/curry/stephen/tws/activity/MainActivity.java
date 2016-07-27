@@ -649,20 +649,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         mTimerAlarm.schedule(mTimerTaskAlarm, ALARM_INTERVAL, ALARM_INTERVAL);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-                mExitTime = System.currentTimeMillis();
-            } else {
-                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
-                finish();
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+//                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+//                mExitTime = System.currentTimeMillis();
+//            } else {
+//                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
+//                finish();
+//            }
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     @Override
     protected void onDestroy() {
