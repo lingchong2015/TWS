@@ -547,6 +547,30 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                 Log.i(TAG, "Get data failed.");
 
                 showProgress(false);
+
+                String lastTransmitterDynamicInformationJsonString = mLastTransmitterDynamicInformationJsonString;
+                String transmitterTotalInformationJsonString = mTransmitterTotalInformationJsonString;
+                mTransmitterTotalInformationModelList = JsonHelper.
+                        <List<TransmitterTotalInformationModel>>fromJson(transmitterTotalInformationJsonString, new
+                                TypeToken<List<TransmitterTotalInformationModel>>() {
+                                }.getType());
+
+                if (!lastTransmitterDynamicInformationJsonString.equals("")) {
+                    Intent intentReceiver = new Intent();
+                    intentReceiver.setAction(ACTION_FRESH_INFO);
+                    intentReceiver.putExtra(EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, lastTransmitterDynamicInformationJsonString);
+                    MainActivity.this.sendBroadcast(intentReceiver);
+                }
+
+                if (statusCode == 404) {
+                    Toast.makeText(MainActivity.this, "未找到请求资源,请查看网络连接地址是否设置正确.",
+                            Toast.LENGTH_LONG).show();
+                } else if (statusCode == 500) {
+                    Toast.makeText(MainActivity.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG)
+                            .show();
+                }
                 showProgress(false);
             }
 
@@ -635,6 +659,33 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
             @Override
             public void failurePostCallBack(int statusCode, Header[] headers, String responseString, Throwable throwable) {
+                Log.i(TAG, "Get data failed.");
+
+                showProgress(false);
+
+                String lastTransmitterDynamicInformationJsonString = mLastTransmitterDynamicInformationJsonString;
+                String transmitterTotalInformationJsonString = mTransmitterTotalInformationJsonString;
+                mTransmitterTotalInformationModelList = JsonHelper.
+                        <List<TransmitterTotalInformationModel>>fromJson(transmitterTotalInformationJsonString, new
+                                TypeToken<List<TransmitterTotalInformationModel>>() {
+                                }.getType());
+
+                if (!lastTransmitterDynamicInformationJsonString.equals("")) {
+                    Intent intentReceiver = new Intent();
+                    intentReceiver.setAction(ACTION_FRESH_INFO);
+                    intentReceiver.putExtra(EXTRAS_FOR_RECEIVER_TRANSMITTER_INFO, lastTransmitterDynamicInformationJsonString);
+                    MainActivity.this.sendBroadcast(intentReceiver);
+                }
+
+                if (statusCode == 404) {
+                    Toast.makeText(MainActivity.this, "未找到请求资源,请查看网络连接地址是否设置正确.",
+                            Toast.LENGTH_LONG).show();
+                } else if (statusCode == 500) {
+                    Toast.makeText(MainActivity.this, "服务器出现错误.", Toast.LENGTH_LONG).show();
+                } else {
+                    Toast.makeText(MainActivity.this, "未处理异常抛出,连接终止.", Toast.LENGTH_LONG)
+                            .show();
+                }
             }
         };
 
@@ -649,20 +700,20 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         mTimerAlarm.schedule(mTimerTaskAlarm, ALARM_INTERVAL, ALARM_INTERVAL);
     }
 
-    @Override
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            if ((System.currentTimeMillis() - mExitTime) > 2000) {
-                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
-                mExitTime = System.currentTimeMillis();
-            } else {
-                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
-                finish();
-            }
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
+//    @Override
+//    public boolean onKeyDown(int keyCode, KeyEvent event) {
+//        if (keyCode == KeyEvent.KEYCODE_BACK) {
+//            if ((System.currentTimeMillis() - mExitTime) > 2000) {
+//                Toast.makeText(this, "再按一次退出程序", Toast.LENGTH_SHORT).show();
+//                mExitTime = System.currentTimeMillis();
+//            } else {
+//                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
+//                finish();
+//            }
+//            return true;
+//        }
+//        return super.onKeyDown(keyCode, event);
+//    }
 
     @Override
     protected void onDestroy() {

@@ -140,7 +140,7 @@ public class LoginActivity extends AppCompatActivity {
         if (cancel) {
             focusView.requestFocus();
         } else {
-            Log.i(TAG, getUserInfoJsonString());
+//            Log.i(TAG, getUserInfoJsonString());
             invokeWebService(ServerHelper.getLoginURI(), new StringEntity(getUserInfoJsonString(), ContentType.APPLICATION_JSON));
 //            test1();
         }

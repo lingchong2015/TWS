@@ -9,53 +9,13 @@ public class TransmitterDynamicInformationModel {
 
     private String name;
     private String frequency;
-    private String transmission_power;//"数据暂无更新，请检查连接是否正常” or “发射机处于关闭状态”.
+    private String transmission_power;
     private String reflection_power;
     private String status;
     private String note;
     private int id;
     private UUID mUUID;
     private String info;
-
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
-    public UUID getUUID() {
-        return mUUID;
-    }
-
-    public void setUUID(UUID UUID) {
-        mUUID = UUID;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
 
     public String getName() {
         return name;
@@ -89,13 +49,53 @@ public class TransmitterDynamicInformationModel {
         this.reflection_power = reflection_power;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public UUID getUUID() {
+        return mUUID;
+    }
+
+    public void setUUID(UUID UUID) {
+        mUUID = UUID;
+    }
+
+    public String getInfo() {
+        return info;
+    }
+
+    public void setInfo(String info) {
+        this.info = info;
+    }
+
     public String[] getItemContent() {
         String nameContent = String.format("频道:%s", name);
 
         if (transmission_power.equals("数据暂无更新，请检查连接是否正常") ||
                 transmission_power.equals("发射机处于关闭状态")) {
             return new String[]{nameContent, transmission_power, "备注:" + note};
-        } else if (status.equals("2")) {
+        } else if (status.equals("1")) {
             return new String[]{nameContent, "报警信息:" + info};
         }
 

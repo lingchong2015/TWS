@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">发射机状态监控系统</string>
+    <string name="app_name">值班管家</string>
     <string name="action_exit">退&#160;&#160;出</string>
     <string name="sign_in">登&#160;&#160;录</string>
     <string name="sign_up">注&#160;&#160;册</string>
