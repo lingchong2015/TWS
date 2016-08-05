@@ -89,22 +89,43 @@ public class TransmitterDynamicInformationModel {
         this.info = info;
     }
 
+    /**
+     * 1: 发射机正常.<br/>
+     * 2: 发射机故障.<br/>
+     * 3: 发射机停止.
+     */
     public String[] getItemContent() {
         String nameContent = String.format("频道:%s", name);
 
-        if (transmission_power.equals("数据暂无更新，请检查连接是否正常") ||
-                transmission_power.equals("发射机处于关闭状态")) {
-            return new String[]{nameContent, transmission_power, "备注:" + note};
-        } else if (status.equals("1")) {
+        if (status.equals("1")) {
+            String frequencyContent = String.format("频率:%s", frequency);
+            String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
+            String reflectionPowerContent = String.format("反射功率:%s", reflection_power);
+            String timeInfo = String.format("备注:%s", note);
+
+            return new String[]{nameContent, frequencyContent, transmissionPowerContent,
+                    reflectionPowerContent, timeInfo};
+        } else if (status.equals("2")) {
             return new String[]{nameContent, "报警信息:" + info};
+        } else if (status.equals("3")) {
+            return new String[]{nameContent, transmission_power, "备注:" + note};
+        } else {
+            return new String[]{};
         }
 
-        String frequencyContent = String.format("频率:%s", frequency);
-        String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
-        String reflectionPowerContent = String.format("反射功率:%s", reflection_power);
-        String timeInfo = String.format("备注:%s", note);
-
-        return new String[]{nameContent, frequencyContent, transmissionPowerContent,
-                reflectionPowerContent, timeInfo};
+//        if (transmission_power.equals("数据暂无更新，请检查连接是否正常") ||
+//                transmission_power.equals("发射机处于关闭状态")) {
+//            return new String[]{nameContent, transmission_power, "备注:" + note};
+//        } else if (status.equals("1")) {
+//            return new String[]{nameContent, "报警信息:" + info};
+//        }
+//
+//        String frequencyContent = String.format("频率:%s", frequency);
+//        String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
+//        String reflectionPowerContent = String.format("反射功率:%s", reflection_power);
+//        String timeInfo = String.format("备注:%s", note);
+//
+//        return new String[]{nameContent, frequencyContent, transmissionPowerContent,
+//                reflectionPowerContent, timeInfo};
     }
 }

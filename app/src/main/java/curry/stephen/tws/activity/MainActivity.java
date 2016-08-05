@@ -124,6 +124,41 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     };
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        if (!hasLogin()) {
+            startLoginActivity();
+        } else {
+            initView();
+            initVariables();
+            initReceiver();
+            initRecyclerView();
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        try {
+            unregisterReceiver(mBroadcastReceiver);
+        } catch (Exception e) {
+            if (e.getMessage().contains("Receiver not registered")) {
+                // Ignore this exception.
+            } else {
+                throw e;
+            }
+        }
+        mTimerTaskAlarm.cancel();
+        stopService(new Intent(this, MyInvokeJsonWebService.class));
+        SharedPreferencesHelper.putString(this, GlobalVariables.LAST_TRANSMITTER_DYNAMIC_INFORMATION,
+                mLastTransmitterDynamicInformationJsonString);
+        SharedPreferencesHelper.putString(this, GlobalVariables.TRANSMITTER_TOTAL_INFORMATION,
+                mTransmitterTotalInformationJsonString);
+    }
+
     private void updateUIInfo(String responseJsonString) {
         mLastTransmitterDynamicInformationJsonString = responseJsonString;
 
@@ -167,12 +202,9 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 
         for (TransmitterDynamicInformationModel transmitterDynamicInformationModel : transmitterDynamicInformationModelList) {
             MyRecyclerViewModel myRecyclerViewModel = new MyRecyclerViewModel();
-
             myRecyclerViewModel.setUUID(transmitterDynamicInformationModel.getUUID());
-
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
                     transmitter_name_formatter), transmitterDynamicInformationModel.getName()));
-
             if (getTransmitterStatus(transmitterDynamicInformationModel) == 0) {
                 myRecyclerViewModel.setInfo(String.format(getString(
                         R.string.transmitter_main_parameters_info_formatter),
@@ -343,32 +375,18 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        if (!hasLogin()) {
-            startLoginActivity();
-        } else {
-            initView();
-            initVariables();
-            initReceiver();
-            initRecyclerView();
-        }
-    }
-
     private void initView() {
         setContentView(R.layout.activity_main);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showParameterInfo();
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                showParameterInfo();
+//            }
+//        });
 
         mProgressBarNetworkDataProcessing = (ProgressBar) findViewById(
                 R.id.progress_bar_network_data_processing);
@@ -714,27 +732,6 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
 //        }
 //        return super.onKeyDown(keyCode, event);
 //    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-
-        try {
-            unregisterReceiver(mBroadcastReceiver);
-        } catch (Exception e) {
-            if (e.getMessage().contains("Receiver not registered")) {
-                // Ignore this exception.
-            } else {
-                throw e;
-            }
-        }
-        mTimerTaskAlarm.cancel();
-        stopService(new Intent(this, MyInvokeJsonWebService.class));
-        SharedPreferencesHelper.putString(this, GlobalVariables.LAST_TRANSMITTER_DYNAMIC_INFORMATION,
-                mLastTransmitterDynamicInformationJsonString);
-        SharedPreferencesHelper.putString(this, GlobalVariables.TRANSMITTER_TOTAL_INFORMATION,
-                mTransmitterTotalInformationJsonString);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

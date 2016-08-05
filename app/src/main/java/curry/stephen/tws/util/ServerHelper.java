@@ -12,14 +12,14 @@ public class ServerHelper {
     private static String currentServerURL = "http://192.168.8.100:8080/";
 //    private static String currentServerURL = "http://192.168.8.102:8080/";
 
-//    private static final String LOGIN = "RFSignalMonitorSystem/servlet/UserLogin";
-    private static final String LOGIN = "servlet/UserLogin";
+    private static final String LOGIN = "RFSignalMonitorSystem/servlet/UserLogin";
+//    private static final String LOGIN = "servlet/UserLogin";
 
-//    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
-    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "servlet/GetChannelInfo";
+    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
+//    private static final String TRANSMITTER_DYNAMIC_INFORMATION = "servlet/GetChannelInfo";
 
-//    private static final String TRANSMITTER_TOTAL_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
-    private static final String TRANSMITTER_TOTAL_INFORMATION = "servlet/GetChannelInfo";
+    private static final String TRANSMITTER_TOTAL_INFORMATION = "RFSignalMonitorSystem/servlet/GetChannelInfo";
+//    private static final String TRANSMITTER_TOTAL_INFORMATION = "servlet/GetChannelInfo";
 
     public static String getDefaultServerURL() {
         return defaultServerURL;
