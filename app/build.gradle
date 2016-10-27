@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "curry.stephen.tws"
-        minSdkVersion 8
+        minSdkVersion 9
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
@@ -27,5 +27,5 @@ dependencies {
     compile 'com.loopj.android:android-async-http:1.4.9'
     compile 'com.google.code.gson:gson:2.4'
     compile 'com.wrapp.floatlabelededittext:library:0.0.5'
-    compile 'com.android.support:recyclerview-v7:24.0.+'
+    compile 'com.android.support:recyclerview-v7:24.0.0'
 }

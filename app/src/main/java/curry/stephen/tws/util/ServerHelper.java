@@ -6,10 +6,10 @@ package curry.stephen.tws.util;
  */
 public class ServerHelper {
 
-    private static String defaultServerURL = "http://192.168.8.100:8080/";
+    private static String defaultServerURL = "http://192.168.43.128:8080/";
 //    private static String defaultServerURL = "http://192.168.8.102:8080/";
 
-    private static String currentServerURL = "http://192.168.8.100:8080/";
+    private static String currentServerURL = "http://192.168.43.128:8080/";
 //    private static String currentServerURL = "http://192.168.8.102:8080/";
 
     private static final String LOGIN = "RFSignalMonitorSystem/servlet/UserLogin";

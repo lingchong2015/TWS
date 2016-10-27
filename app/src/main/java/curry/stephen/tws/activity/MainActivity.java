@@ -206,19 +206,36 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
             myRecyclerViewModel.setTransmitterName(String.format(getString(R.string.
                     transmitter_name_formatter), transmitterDynamicInformationModel.getName()));
             if (getTransmitterStatus(transmitterDynamicInformationModel) == 0) {
-                myRecyclerViewModel.setInfo(String.format(getString(
-                        R.string.transmitter_main_parameters_info_formatter),
-                        transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
-                        transmitterDynamicInformationModel.getReflection_power()));
+                if (transmitterDynamicInformationModel.getName().contains("电视")) {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_tv_main_parameters_info_formatter),
+                            transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                            transmitterDynamicInformationModel.getReflection_power()));
+                } else {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_main_parameters_info_formatter),
+                            transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                            transmitterDynamicInformationModel.getReflection_power()));
+                }
+
                 myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball));
                 myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
                 myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
                 myRecyclerViewModelMapNormal.put(transmitterDynamicInformationModel.getId(), myRecyclerViewModel);
             } else if (getTransmitterStatus(transmitterDynamicInformationModel) == 1) {
-                myRecyclerViewModel.setInfo(String.format(getString(
-                        R.string.transmitter_main_parameters_info_formatter),
-                        transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
-                        transmitterDynamicInformationModel.getReflection_power()));
+                if (transmitterDynamicInformationModel.getName().contains("电视")) {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_tv_main_parameters_info_formatter),
+                            transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                            transmitterDynamicInformationModel.getReflection_power()));
+                } else {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_main_parameters_info_formatter),
+                            transmitterDynamicInformationModel.getFrequency(), transmitterDynamicInformationModel.getTransmission_power(),
+                            transmitterDynamicInformationModel.getReflection_power()));
+                }
+
+
                 myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
                 myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball));
                 myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
@@ -274,19 +291,35 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
                     transmitter_name_formatter), transmitterTotalInformationModel.getName()));
 
             if (getTransmitterStatus(transmitterTotalInformationModel) == 0) {
-                myRecyclerViewModel.setInfo(String.format(getString(
-                        R.string.transmitter_main_parameters_info_formatter),
-                        transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
-                        transmitterTotalInformationModel.getReflection_power()));
+                if (transmitterTotalInformationModel.getName().contains("电视")) {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_tv_main_parameters_info_formatter),
+                            transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                            transmitterTotalInformationModel.getReflection_power()));
+                } else {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_main_parameters_info_formatter),
+                            transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                            transmitterTotalInformationModel.getReflection_power()));
+                }
+
                 myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball));
                 myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball_gray));
                 myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
                 myRecyclerViewModelMapNormal.put(transmitterTotalInformationModel.getId(), myRecyclerViewModel);
             } else if (getTransmitterStatus(transmitterTotalInformationModel) == 1) {
-                myRecyclerViewModel.setInfo(String.format(getString(
-                        R.string.transmitter_main_parameters_info_formatter),
-                        transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
-                        transmitterTotalInformationModel.getReflection_power()));
+                if (transmitterTotalInformationModel.getName().contains("电视")) {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_tv_main_parameters_info_formatter),
+                            transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                            transmitterTotalInformationModel.getReflection_power()));
+                } else {
+                    myRecyclerViewModel.setInfo(String.format(getString(
+                            R.string.transmitter_main_parameters_info_formatter),
+                            transmitterTotalInformationModel.getFrequency(), transmitterTotalInformationModel.getTransmission_power(),
+                            transmitterTotalInformationModel.getReflection_power()));
+                }
+
                 myRecyclerViewModel.setDrawableStatusGreen(getResources().getDrawable(R.drawable.green_ball_gray));
                 myRecyclerViewModel.setDrawableStatusRed(getResources().getDrawable(R.drawable.red_ball));
                 myRecyclerViewModel.setDrawableStatusWhite(getResources().getDrawable(R.drawable.blue_ball));
@@ -766,7 +799,7 @@ public class MainActivity extends AppCompatActivity implements Handler.Callback,
         builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
+//                SharedPreferencesHelper.putBoolean(MainActivity.this, GlobalVariables.IS_LOGIN, false);
                 MainActivity.this.finish();
             }
         });

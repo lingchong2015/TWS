@@ -16,6 +16,7 @@ public class TransmitterTotalInformationModel {
     private int id;
     private UUID mUUID;
     private String info;
+    private String datetime;
 
     public String getInfo() {
         return info;
@@ -89,22 +90,34 @@ public class TransmitterTotalInformationModel {
         this.reflection_power = reflection_power;
     }
 
+    public String getDatetime() {
+        return datetime;
+    }
+
+    public void setDatetime(String datetime) {
+        this.datetime = datetime;
+    }
+
     public String[] getItemContent() {
-        String nameContent = String.format("频道:%s", name);
+        String nameContent = String.format("%s", name);
 
-        if (transmission_power.equals("数据暂无更新，请检查连接是否正常") ||
-                transmission_power.equals("发射机处于关闭状态")) {
-            return new String[]{nameContent, transmission_power, "备注:" + note};
-        } else if (status.equals("1")) {
-            return new String[]{nameContent, "报警信息:" + info};
+        if (status.equals("1")) {
+            String frequencyContent = String.format("频率:%sMHZ", frequency);
+            String transmissionPowerContent = String.format("发射功率:%sKW", transmission_power);
+            String reflectionPowerContent = String.format("反射功率:%sW", reflection_power);
+            String infoDatetime = String.format("接收时间:%s", datetime);
+            String timeInfo = String.format("备注:%s", (note == null ? "" : note));
+
+            return new String[]{nameContent, frequencyContent, transmissionPowerContent,
+                    reflectionPowerContent, infoDatetime, timeInfo};
+        } else if (status.equals("2")) {
+            String infoDatetime = String.format("故障时间:%s", datetime);
+            return new String[]{nameContent, infoDatetime,"报警信息:" + info};
+        } else if (status.equals("3")) {
+            String infoDatetime = String.format("停止时间:%s", datetime);
+            return new String[]{nameContent, transmission_power, infoDatetime, "备注:" + (note == null ? "" : note)};
+        } else {
+            return new String[]{};
         }
-
-        String frequencyContent = String.format("频率:%s", frequency);
-        String transmissionPowerContent = String.format("发射功率:%s", transmission_power);
-        String reflectionPowerContent = String.format("反射功率:%s", reflection_power);
-        String timeInfo = String.format("备注:%s", note);
-
-        return new String[]{nameContent, frequencyContent, transmissionPowerContent,
-                reflectionPowerContent, timeInfo};
     }
 }
